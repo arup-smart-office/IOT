@@ -11,6 +11,10 @@ GPIO_PIR = 4
 # Set GPIO Direction
 GPIO.setup(GPIO_PIR, GPIO.IN)
 
+def checkMotion(GPIO_PIR):
+    if GPIO.input(GPIO_PIR):
+        print ("Motion Detected")
+
 # Add time delay
 try:
     print ("PIR Module Test (Crtl + C to exit)")
@@ -19,8 +23,6 @@ try:
 
     # Check status of PIR pin on loop
     while True:
-        if GPIO.input(GPIO_PIR):
-            print ("Motion Detected!")
         time.sleep(1)
 
 except KeyboardInterrupt:

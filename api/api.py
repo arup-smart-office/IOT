@@ -14,14 +14,13 @@ def postDesk(variables):
   }
   """
   request = requests.post(awsmobile["aws_appsync_graphqlEndpoint"], json={'query': query, 'variables': variables}, headers=headers)
-  print(request, '<<< request')
-  print(request.status_code, '<<<< status code')
   if request.status_code == 200:
     return request.json()
+  else:
+    print (request)
 
 
 def getDesk(id):
-  print(id)
   query = """
   query GetDesk($id: ID!) {
     getDesk(id: $id) {
@@ -32,4 +31,6 @@ def getDesk(id):
   request = requests.post(awsmobile["aws_appsync_graphqlEndpoint"], json={'query': query, 'variables': {'id': id}}, headers=headers)
   if request.status_code == 200:
     return request.json()
+  else:
+    print (request)
 
