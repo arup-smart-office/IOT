@@ -14,18 +14,20 @@ GPIO.setup(GPIO_VIBRATION, GPIO.IN)
 print ("Running Vibration Sensor Component")
 
 # Define function call
-def checkVibration():
+def checkVibration(update_vibration_motion):
 
     # Define a threaded callback function
     def vibration_callback(GPIO_VIBRATION):
 
         # Code for if GPIO_VIBRATION channel goes high
         if GPIO.input(GPIO_VIBRATION):
-            print ("Vibration Detected!")
+            update_vibration_motion(time.time())
+            print ("Vibration Detected!", time.time())
 
         # Code for if GPIO_VIBRATION channel goes low
         else:
-            print ("Vibration Detected!")
+            update_vibration_motion(time.time())
+            print ("Vibration Detected!", time.time())
 
     # Add event detect function to detect rising or falling edge
     GPIO.add_event_detect(GPIO_VIBRATION, GPIO.BOTH, bouncetime=300)
@@ -46,3 +48,8 @@ def checkVibration():
 
         # Cleanup GPIO Input pins
         GPIO.cleanup()
+
+#checkVibration(lambda x:(x))
+
+#while True:
+    #time.sleep(0.1)
