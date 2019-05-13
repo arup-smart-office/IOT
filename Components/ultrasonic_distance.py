@@ -10,24 +10,27 @@ GPIO_TRIGGER = 18
 GPIO_ECHO = 24
 
 # Set GPIO Direction for Pins
+GPIO.setwarnings(False)
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
 
-# Define Trigger Function
-def distance():
+print ("Running Distance Sensor Component")
 
-    # Set Trigger Pin to HIGH
+# Define Trigger Function
+def checkDistance():
+
+    # Set Trigger Pin to HIGH to send Ultrasonic pulse
     GPIO.output(GPIO_TRIGGER, True)
 
-    # Set sleep timer and Toggle Trigger Pin
+    # Set sleep timer and toggle Trigger Pin to end pulse 
     time.sleep(0.0001)
     GPIO.output(GPIO_TRIGGER, False)
 
-    # Define variables for start and end of signal transmission
+    # Define variables for start at end of signal transmission
     StartTime = time.time()
     StopTime = time.time()
 
-    # Save StartTime
+    # Start timer on Echo pin ready to receive signal
     while GPIO.input(GPIO_ECHO) == 0:
         StartTime = time.time()
 
@@ -42,15 +45,15 @@ def distance():
     distance = (TimeElapsed * 34300) / 2
 
     return distance
-
+  
 if __name__ == '__main__':
     try:
         while True:
-            dist = distance()
+            dist = checkDistance()
             print ("Measured Distance = %.1f cm" % dist)
             time.sleep(1)
 
-        # Reset by pressing CTRL + C
+    # Reset by pressing CTRL + C
     except KeyboardInterrupt:
         print("Measurement stopped by User")
         GPIO.cleanup()
