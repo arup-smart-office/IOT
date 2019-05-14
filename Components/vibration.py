@@ -2,19 +2,20 @@
 import RPi.GPIO as GPIO
 import time
 
-# Set GPIO mode (BOARD / BCM)
-GPIO.setmode(GPIO.BCM)
-
-# Assign input pin
-GPIO_VIBRATION = 17
-
-# Set GPIO Direction
-GPIO.setup(GPIO_VIBRATION, GPIO.IN)
 
 print ("Running Vibration Sensor Component")
 
 # Define function call
 def checkVibration(update_vibration_motion):
+    
+    # Set GPIO mode (BOARD / BCM)
+    GPIO.setmode(GPIO.BCM)
+
+    # Assign input pin
+    GPIO_VIBRATION = 17
+
+    # Set GPIO Direction
+    GPIO.setup(GPIO_VIBRATION, GPIO.IN)
 
     # Define a threaded callback function
     def vibration_callback(GPIO_VIBRATION):

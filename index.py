@@ -1,4 +1,5 @@
 # Import Python Libraries
+import RPi.GPIO as GPIO
 import sys
 import time
 import numpy
@@ -14,6 +15,11 @@ from api import getDesk, postDesk
 from pir import checkMotion
 from vibration import checkVibration
 from ultrasonic_distance import checkDistance
+from temp_humid import checkTempAndHumid
+from sound import checkSound
+
+# Set GPIO mode
+GPIO.setmode(GPIO.BCM)
 
 # Create JSON data object for api call
 ID = 1
@@ -49,13 +55,35 @@ def update_vibration_motion(time):
         vibration_motion_activated = True
 checkVibration(update_vibration_motion)
 
+temperature_reading = None
+def update_temperature_reading(time):
+        global temperature_Reading
+        temperature_reading = time
+
+humidity_reading = None
+def update_humidity_reading(time):
+        global humidity_reading
+        humidity_reading = time
+
+sound_detected = None
+sound_detector_activated = False
+def update_sound_detected(time):
+        global sound_detected
+        global sound_detector_activated
+        sound_detected = time
+        sound_detector_activated = True
+checkSound(update_sound_detected)
+
 # Enter indefinite loop for sensor components
 while True:
 
-	# print ("Measured Distance = %.1f cm" % checkDistance())
+        checkTempAndHumid(update_temperature_reading, update_humidity_reading)
+        
+	print ("Measured Distance = %.1f cm" % checkDistance())
+
         # Append new distance measurements to the array
         distance_measurements.append(checkDistance())
-        #print(distance_measurements)
+        # print(distance_measurements)
 
         # Test if 30 distance readings have been made
 	if len(distance_measurements) > 30:
@@ -87,18 +115,18 @@ while True:
                                and pir_motion_activated\
                                and distance_activated)
 
-                #print (vibration_motion_activated, "<<-- VIBRATION")
-                #print (pir_motion_activated, "<<--MOTION")
-                #print (distance_activated, "<<--DISTANCE")
+                print (vibration_motion_activated, "<<-- VIBRATION")
+                print (pir_motion_activated, "<<--MOTION")
+                print (distance_activated, "<<--DISTANCE")
                 print (is_occupied,"<<-- DESK_OCCUPANCY")
                 
                 # Make API call to database
-                variables = {'input': {'id': ID, 'expectedVersion': previous_version, 'isOccupied': is_occupied}}
-                result = postDesk(variables)
-                print (result)
-                print (previous_version)
-                previous_version = result['data']['updateDesk']['version']
-                print (previous_version)
+                #variables = {'input': {'id': ID, 'expectedVersion': previous_version, 'isOccupied': is_occupied}}
+                #result = postDesk(variables)
+                #print (result)
+                #print (previous_version)
+                #previous_version = result['data']['updateDesk']['version']
+                #print (previous_version)
 
                 # Clear distance measurements array and set Vibration and Motion sensors to false
                 vibration_motion_activated = False
