@@ -29,7 +29,7 @@ def checkTempAndHumid(update_temperature_reading, update_humidity_reading):
             
         update_temperature_reading(result.temperature)
         update_humidity_reading(result.humidity)
-            
+
         print ("Last valid input: " + str(datetime.datetime.now()))
         print ("Temperature: %d C" % result.temperature)
         print ("Humidity: %d %%" % result.humidity)
@@ -41,4 +41,7 @@ def checkTempAndHumid(update_temperature_reading, update_humidity_reading):
     # Add threaded callback function
     #GPIO.add_event_callback(GPIO_TempAndHumid, tempAndHumid_callback)
 
-        
+#checkTempAndHumid(lambda x: (x), lambda x: (x))
+
+#while True:
+    #time.sleep(0.1)

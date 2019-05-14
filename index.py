@@ -17,6 +17,7 @@ from vibration import checkVibration
 from ultrasonic_distance import checkDistance
 from temp_humid import checkTempAndHumid
 from sound import checkSound
+from light import checkLight
 
 # Set GPIO mode
 GPIO.setmode(GPIO.BCM)
@@ -32,6 +33,12 @@ previous_version = result['data']['getDesk']['version']
 
 # Define empty array / list for distance measuements
 distance_measurements = []
+
+# Define empty array / list for temperature readings
+temperature_readings = []
+
+# Define empty array / list for humidity readings
+humidity_readings = []
 
 # Invoke desk occupancy functions
 pir_motion = None
@@ -56,14 +63,18 @@ def update_vibration_motion(time):
 checkVibration(update_vibration_motion)
 
 temperature_reading = None
-def update_temperature_reading(time):
-        global temperature_Reading
-        temperature_reading = time
+def update_temperature_reading(temp):
+        global temperature_reading
+        global temperature_readings
+        temperature_reading = temp
+        temperature_readings.append(temperature_reading)
 
 humidity_reading = None
-def update_humidity_reading(time):
+def update_humidity_reading(humid):
         global humidity_reading
-        humidity_reading = time
+        global humidty_readings
+        humidity_reading = humid
+        humidity_readings.append(humidity_reading)
 
 sound_detected = None
 sound_detector_activated = False
@@ -74,12 +85,32 @@ def update_sound_detected(time):
         sound_detector_activated = True
 checkSound(update_sound_detected)
 
+light_detected = None
+light_sensor_activated = False
+def update_light_detected(time):
+        global light_detected
+        global light_sensor_activated
+        light_detected = time
+        light_sensor_activated = True
+checkLight(update_light_detected)
+
 # Enter indefinite loop for sensor components
 while True:
 
         checkTempAndHumid(update_temperature_reading, update_humidity_reading)
+
+        #print (temperature_reading, "<<-- temp reading")
+        #print (humidity_reading, "<<-- humid reading")
+
+        #print (temperature_readings, "<<--TEMP")
+        #print (humidity_readings, "<<--HUMID")
+
         
-	print ("Measured Distance = %.1f cm" % checkDistance())
+        # Calculate average temperature and humity readings
+        temperature_avrg_reading = numpy.average(temperature_readings)
+        humidity_avrg_reading = numpy.average(humidity_readings)
+
+	#print ("Measured Distance = %.1f cm" % checkDistance())
 
         # Append new distance measurements to the array
         distance_measurements.append(checkDistance())
@@ -115,13 +146,21 @@ while True:
                                and pir_motion_activated\
                                and distance_activated)
 
+                
+                # Print Desk Occupancy and Environmental Component Readings
                 print (vibration_motion_activated, "<<-- VIBRATION")
                 print (pir_motion_activated, "<<--MOTION")
                 print (distance_activated, "<<--DISTANCE")
+                print (temperature_avrg_reading, "<<--TEMPERATURE")
+                print (humidity_avrg_reading, "<<-- HUMIDITY")
+                print (light_sensor_activated, "<<-- LIGHT")
+                print (sound_detector_activated,"<<-- SOUND")
                 print (is_occupied,"<<-- DESK_OCCUPANCY")
                 
                 # Make API call to database
-                #variables = {'input': {'id': ID, 'expectedVersion': previous_version, 'isOccupied': is_occupied}}
+                # variables = {'input': {'id': ID, 'expectedVersion': previous_version,'isOccupied': is_occupied,\
+                # 'temperature': round(temperature_avrg_reading, 2), 'humidity': round(humidity_avrg_reading, 2), 'light': light_sensor_activated,\
+                # 'sound': sound_detector_activated}}
                 #result = postDesk(variables)
                 #print (result)
                 #print (previous_version)
@@ -132,6 +171,10 @@ while True:
                 vibration_motion_activated = False
                 pir_motion_activated = False
                 distance_measurements = []
+                temperature_Readings = []
+                humidity_readings = []
+                light_sensor_activated = False
+                sound_detector_activated = False
 
                 #print (average_distance, max_distance, min_distance)
 		
